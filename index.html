@@ -1,18 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Sketch</title>
+		<title>Cost and Affordability of a Healthy Diet</title>
 
-    <link rel="stylesheet" type="text/css" href="style.css">
+		<link rel="stylesheet" type="text/css" href="intro/style.css">
 
-    <script src="libraries/p5.min.js"></script>
-    <script src="libraries/p5.sound.min.js"></script>
-  </head>
+		<script src="libraries/p5.min.js"></script>
+		<script src="libraries/p5.fillgradient.js"></script>
 
-  <body>
-    <script src="sketch.js"></script>
-  </body>
+		<script src="intro/script/glyph.js"></script>
+		<script src="intro/script/intro.js"></script>
+	</head>
+
+	<body>
+		<div class="sketch" id="sketch0" style="z-index: 6;"></div>
+		<div class="sketch" id="sketch1" style="z-index: 5;" hidden></div>
+		<div class="sketch" id="sketch2" style="z-index: 4;" hidden></div>
+		<div class="sketch" id="sketch3" style="z-index: 3;" hidden></div>
+		<div class="sketch" id="sketch4" style="z-index: 2;" hidden></div>
+		<div class="sketch" id="sketch5" style="z-index: 1;" hidden></div>
+		<div class="sketch" id="sketch6" style="z-index: 0;" hidden></div>
+
+		<div id="sketch-list">
+			<button class="sketch-button"></button>
+			<button class="sketch-button"></button>
+			<button class="sketch-button"></button>
+			<button class="sketch-button"></button>
+			<button class="sketch-button"></button>
+			<button class="sketch-button"></button>
+			<button class="sketch-button"></button>
+		</div>
+
+		<button class="buttons" id="forward"></button>
+		<a href="chart/chart.html">
+			<button class="buttons" id="leave">Show Chart</button>
+		</a>
+		<script src="intro/script/onboarding.js"></script>
+	</body>
 </html>
