@@ -1,5 +1,5 @@
 class countryFilter {
-  constructor(tableObj, minCohd, maxCohd, minNua, maxNua, x0, xAxes, y0, yAxes, nRows) {
+  constructor(tableObj, minCohd, maxCohd, minNua, maxNua, x0, xAxes, y0, yAxes) {
     this.tableObj = tableObj;
     this.minCohd = minCohd;
     this.maxCohd = maxCohd;

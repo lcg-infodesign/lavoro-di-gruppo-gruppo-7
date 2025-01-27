@@ -5,7 +5,7 @@
 
 // isPointInsideShape()
 // 		algoritmo che verifica se il punto è interno alla forma
-//		 uso del "Ray casting algorithm" per verificare che i punti della texture siano generati solo all'interno del paese
+//		uso del "Ray casting algorithm" per verificare che i punti della texture siano generati solo all'interno del paese
 // 		reference: https://en.wikipedia.org/wiki/Point_in_polygon 
 function isPointInsideShape(shapePoints, x, y) {
 	let inside = false;

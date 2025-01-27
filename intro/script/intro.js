@@ -36,8 +36,8 @@ let example = {
 function createScrollButton(p) {
 	p.stroke(FG_COLOR);
 	p.strokeWeight(3);
-	p.line(p.width/2 - 60, p.height - 80, p.width/2, p.height - 40);
-	p.line(p.width/2 + 60, p.height - 80, p.width/2, p.height - 40);
+	p.line(p.width / 2 - 60, p.height - 80, p.width / 2, p.height - 40);
+	p.line(p.width / 2 + 60, p.height - 80, p.width / 2, p.height - 40);
 }
 
 // primo sketch
@@ -58,11 +58,11 @@ function sketch0(p) {
 		// titolo
 		p.textSize(60 * rf);
 		p.textAlign(p.CENTER, p.CENTER);
-		p.text("Cost and Unaffordability\nof a Healthy Diet", p.width/2, p.height/2);
+		p.text("Cost and Unaffordability\nof a Healthy Diet", p.width / 2, p.height / 2);
 
 		// sottotitolo
 		p.textSize(18 * rf);
-		p.text("FAOSTAT • 2019 - 2022", p.width/2, p.height/2 + 100 * rf);
+		p.text("FAOSTAT • 2019 - 2022", p.width / 2, p.height / 2 + 100 * rf);
 
 		createScrollButton(p);
 	}
@@ -93,13 +93,10 @@ function sketch1(p) {
 		// paragrafi di testo
 		p.textSize(24 * rf);
 		p.textAlign(p.CENTER, p.CENTER);
+		// \n
 		p.text(
-			"Each year millions of people do not have access\n" +
-			"to a healthy and balanced diet.\n\nBetween 2019 and 2022, Covid-19 worsened " +
-			"the situation,\nsince then access to a sustainable diet\nhas been one of the main goals " +
-			"of Agenda 2030.\n\nFollows a chart that shows\npercentage of access and costs of a " +
-			"healthy diet\nduring that time.",
-			p.width/2, p.height/2
+			"Every year, millions of people face limited\n access to a healthy and balanced diet.\n\n Between 2019 and 2022, the Covid-19 pandemic worsened\n this issue, making it increasingly difficult for many to afford\n sustainable nutrition. Consequently, ensuring access to a healthy\n diet has become an even more central objective within the 2030\n Agenda for Sustainable Development.\n\n The following chart illustrates the percentage of unaffordability\n and the costs associated with a healthy diet during this period.",
+			p.width / 2, p.height / 2
 		);
 
 		createScrollButton(p);
@@ -129,14 +126,30 @@ function sketch2(p) {
 		// descrizione
 		p.textSize(24 * rf);
 		p.textAlign(p.CENTER, p.CENTER);
-		p.text("Each stain inside the chart depicts a country", p.width/2, p.height/2 - 120 * rf);
+		p.text("Each stain inside the chart depicts a country", p.width / 2, p.height / 2 - 120 * rf);
+		// noise per forma della macchia
+		let pointsShape = [];
+		let noiseScale = 0.3;
+		// disegnare i paesi con forme irregolari (noise)
+		for (let angle = 0; angle < p.TWO_PI; angle += 0.1) {
+			let dx = p.cos(angle) * SMALL_CIRCLE_SIZE * rf;
+			let dy = p.sin(angle) * SMALL_CIRCLE_SIZE * rf;
+			// aggiungo una randomicità ai valori dati a noise per far si che le macchie non siano speculari rispetto all'asse y
+			let noiseFactor = p.map(p.noise(dx * noiseScale + p.random(-1, 1), dy * noiseScale + p.random(-1, 1)), 0, 1, 1, 1.1);
+			pointsShape.push({
+				x: (p.width / 2) + dx * noiseFactor,
+				y: (p.height / 2 + 50 * rf) + dy * noiseFactor
+			});
+		}
+		p.beginShape();
+		for (let pt of pointsShape) {
+			p.vertex(pt.x, pt.y);
+		}
+		p.endShape(p.CLOSE);
 
 		// nome paese
 		p.textSize(50 * rf);
-		p.text(example.country, p.width/2, p.height/2 - 40 * rf);
-
-		// glifo semplice
-		p.circle(p.width/2, p.height/2 + 50 * rf, SMALL_CIRCLE_SIZE * rf);
+		p.text("Country", p.width / 2, p.height / 2 - 40 * rf);
 
 		createScrollButton(p);
 	}
@@ -167,20 +180,40 @@ function sketch3(p) {
 		p.textAlign(p.CENTER, p.CENTER);
 		p.text(
 			"Its size is determined by how many people\n" +
-			"do not have access to a healthy diet",
-			p.width/2, p.height/2 - 120 * rf
+			"did not have access to a healthy diet",
+			p.width / 2, p.height / 2 - 120 * rf
 		);
 
 		// nome paese
 		p.textSize(50 * rf);
-		p.text(example.country, p.width/2, p.height/2 - 40 * rf);
+		p.text(example.country, p.width / 2, p.height / 2 - 40 * rf);
 
 		// glifo semplice
-		p.circle(p.width/2, p.height/2 + 50 * rf, BIG_CIRCLE_SIZE * rf);
+		// p.circle(p.width / 2, p.height / 2 + 50 * rf, BIG_CIRCLE_SIZE * rf);
+		// noise per forma della macchia
+		let pointsShape = [];
+		let noiseScale = 0.25;
+		// disegnare i paesi con forme irregolari (noise)
+		for (let angle = 0; angle < p.TWO_PI; angle += 0.1) {
+			let dx = p.cos(angle) * BIG_CIRCLE_SIZE/2 * rf;
+			let dy = p.sin(angle) * BIG_CIRCLE_SIZE/2 * rf;
+			// aggiungo una randomicità ai valori dati a noise per far si che le macchie non siano speculari rispetto all'asse y
+			let noiseFactor = p.map(p.noise(dx * noiseScale + p.random(-1, 1), dy * noiseScale + p.random(-1, 1)), 0, 1, 1, 1.1);
+			pointsShape.push({
+				x: (p.width / 2) + dx * noiseFactor,
+				y: (p.height / 2 + 50 * rf) + dy * noiseFactor
+			});
+		}
+		p.beginShape();
+		for (let pt of pointsShape) {
+			p.vertex(pt.x, pt.y);
+		}
+		p.endShape(p.CLOSE);
+
 
 		// nua
 		p.textSize(30 * rf);
-		p.text(example.nua, p.width/2, p.height/2 + 140 * rf);
+		p.text(example.nua, p.width / 2, p.height / 2 + 140 * rf);
 
 		createScrollButton(p);
 	}
@@ -210,21 +243,21 @@ function sketch4(p) {
 		p.textSize(24 * rf);
 		p.textAlign(p.CENTER, p.CENTER);
 		p.text(
-			"There are four income levels rappresented\nby four different colors",
-			p.width/2, p.height/2 - 120 * rf
+			"There are four income levels represented\nby four different colors",
+			p.width / 2, p.height / 2 - 120 * rf
 		);
 
 		// nome paese
 		p.textSize(50 * rf);
-		p.text(example.country, p.width/2, p.height/2 - 40 * rf);
+		p.text(example.country, p.width / 2, p.height / 2 - 40 * rf);
 
 		// glifo finale
-		stain(p, p.width/2, p.height/2 + 50 * rf, MEDIUM_CIRCLE_SIZE * rf, STAIN_COLOR1, STAIN_COLOR2);
+		stain(p, p.width / 2, p.height / 2 + 50 * rf, MEDIUM_CIRCLE_SIZE * rf, STAIN_COLOR1, STAIN_COLOR2);
 
 		// income
 		p.fill(FG_COLOR);
 		p.textSize(30 * rf);
-		p.text(example.income, p.width/2, p.height/2 + 140 * rf);
+		p.text(example.income, p.width / 2, p.height / 2 + 140 * rf);
 
 		createScrollButton(p);
 	}
@@ -263,7 +296,7 @@ function sketch5(p) {
 		p.fill(FG_COLOR);
 		p.textSize(15 * rf);
 		p.textAlign(p.CENTER);
-		p.text("COST (USD)", (p.width - SIDE_MARGIN * rf + AXIS_START * rf)/2, TOP_MARGIN * rf - 20 * rf);
+		p.text("COST (USD)", (p.width - SIDE_MARGIN * rf + AXIS_START * rf) / 2, TOP_MARGIN * rf - 20 * rf);
 
 		// etichette estremi asse
 		p.textAlign(p.LEFT);
@@ -272,8 +305,8 @@ function sketch5(p) {
 		p.text("7 USD", p.width - SIDE_MARGIN * rf, TOP_MARGIN * rf - 20 * rf);
 		p.textAlign(p.CENTER);
 
-		let centerX = p.width/2;
-		let centerY = p.height/2;
+		let centerX = p.width / 2;
+		let centerY = p.height / 2;
 
 		// calcolo larghezza titolo e sottotitolo
 		p.textSize(30 * rf);
@@ -344,7 +377,7 @@ function sketch6(p) {
 		p.background(BG_COLOR);
 		p.textFont("Georgia");
 
-		let centerY = p.height/2;
+		let centerY = p.height / 2;
 
 		// asse y (con punta a freccia)
 		p.stroke(FG_COLOR);
@@ -359,15 +392,16 @@ function sketch6(p) {
 		p.textSize(15 * rf);
 		p.textAlign(p.CENTER, p.CENTER);
 		p.push();
-		p.translate((AXIS_START - 20) * rf, (p.height - SIDE_MARGIN * rf + TOP_MARGIN * rf)/2);
-		p.rotate(-p.PI/2);
+		p.translate((AXIS_START - 20) * rf, (p.height - SIDE_MARGIN * rf + TOP_MARGIN * rf) / 2);
+		p.rotate(-p.PI / 2);
+		p.textAlign(p.CENTER, p.BASELINE);
 		p.text("UNAFFORDABILITY (%)", 0, 0);
 		p.pop();
 
 		// etichette estremi asse
 		p.textAlign(p.RIGHT, p.TOP);
 		p.text("0 %", AXIS_START * rf - 20 * rf, TOP_MARGIN * rf);
-		p.textAlign(p.RIGHT, p.BOTTOM);
+		p.textAlign(p.RIGHT, p.BASELINE);
 		p.text("100 %", AXIS_START * rf - 20 * rf, p.height - SIDE_MARGIN * rf);
 
 		// collegamento glifo-asse
@@ -392,8 +426,8 @@ function sketch6(p) {
 		// sottotitolo
 		p.textSize(18 * rf);
 		p.text(
-		    "Percentage of people who do not\nhave access to a healthy diet (PUA)",
-		    MEDIUM_CIRCLE_SIZE * rf + STAIN_SPACING * rf, 10 * rf
+			"Percentage of people who do not\nhave access to a healthy diet (PUA)",
+			MEDIUM_CIRCLE_SIZE * rf + STAIN_SPACING * rf, 10 * rf
 		);
 		p.pop();
 	}

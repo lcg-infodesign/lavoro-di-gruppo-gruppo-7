@@ -116,7 +116,7 @@ function draw() {
   textStyle(NORMAL);
   textSize(width * 0.011);
   textWrap(WORD);
-  text('Our goal is to leverage the Cost and Affordability of a Healthy Diet (CoAHD) dataset from FAOStat to analyze and better understand the global issue of food inaccessibility. By adopting an evidence-based approach, we strive to contribute to the creation of a fairer and more inclusive food system that guarantees the right to food for all.', width * 0.1, height * 0.17, width * 0.35);
+  text('Our goal is to leverage the "Cost and Affordability of a Healthy Diet" (CoAHD) dataset from FAOStat to analyze and better understand the global issue of food inaccessibility. By adopting an evidence-based approach, we strive to contribute to the creation of a fairer and more inclusive food system that guarantees the right to food for all.', width * 0.1, height * 0.17, width * 0.35);
   text('We are a team of seven students from Politecnico di Milano, united by a passion for data analysis and its potential to address global challenges. Our goal is to apply a rigorous approach to dataset analysis, transforming complex data into actionable knowledge to create a positive and transformative impact.', width * 0.55, height * 0.17, width * 0.35);
 
 

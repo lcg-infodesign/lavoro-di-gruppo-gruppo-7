@@ -25,7 +25,6 @@ let xAxes;
 let yAxes;
 // liste / oggetti
 let buttons = [];
-let dataSaved = [];
 let countriesByYear = [];
 let yearData;
 let legendShapes = [];
@@ -57,17 +56,16 @@ let strokeIncomeColors = ["#6a2775", "#8b4062", "#ad6936", "#dab61c"]
 let noDataColor = ["#FFFFFF", "#ced0d4", "#939393"];
 let puaColor = ("#FFFFFF80");
 
+let legendX;
+let legendSize;
+
 // valori per il glifo di sfondo sul focus
 let focusShapePoints;
 let focusGradientPoints;
 let focusGrainDots;
-
 let focusGlyphX;
 let focusGlyphY;
 let focusGlyphD;
-
-let legendX;
-let legendSize;
 
 function preload() {
   table = loadTable("../assets/datadef.csv", "csv", "header");
@@ -76,13 +74,23 @@ function preload() {
 function setup() {
   createCanvas(windowWidth, windowHeight);
   frameRate(60)
+  initializeNavigationButtons();
+  // converto csv in oggetto
+  tableObj = table.getObject();
+  nRows = table.getRowCount();
+  manageData();
+  manageAxes();
+  manageCountry();
+  manageLegend();
+  // macchia focus
+  manageFocus()
+}
 
-
-  // bottoni di navigazione
+function initializeNavigationButtons() {
   buttons.forEach(btn => btn.remove());
   buttons = [];
-  let buttonLabels = ['About', 'Definitions', 'Show Chart', 'Introduction'];
-  let buttonLinks = [
+  const buttonLabels = ['About', 'Definitions', 'Show Chart', 'Introduction'];
+  const buttonLinks = [
     '../about/about.html',
     '../definition/definition.html',
     '../chart/chart.html',
@@ -93,30 +101,15 @@ function setup() {
     btn.mousePressed(() => (window.location.href = buttonLinks[i]));
     buttons.push(btn);
   });
-
-  // stile dei bottoni di navigazione tra le pagine
   btnWidth = width * 0.08;
   btnHeight = height * 0.04;
   txtSize = width * 0.010;
-  // padding (spazio tra i bottoni) = 0.01*width
-  spacing = 0.08 + 0.01; // p1-p2 = spacing
+  spacing = 0.08 + 0.01;
   p1 = 1 - spacing;
   let p2 = p1 - spacing;
   let p4 = 1 - p1;
   let p3 = spacing + p4;
   updateNavButtons(p1, p2, p3, p4, btnWidth, btnHeight, txtSize);
-
-  // converto csv 
-  tableObj = table.getObject();
-  nRows = table.getRowCount();
-  manageData();
-  manageAxes();
-  manageCountry();
-  calculateGradient();
-  manageLegend();
-
-  // macchia focus
-  manageFocus()
 }
 function updateNavButtons(p1, p2, p3, p4, w, h, txtSize) {
   //posizione bottone che parte da sinistra
@@ -201,119 +194,20 @@ function manageAxes() {
   //asse y 
   yAxes = windowHeight - y0 / 2 - 30;
 }
-function manageCountry() {
-  yearData = new countryFilter(tableObj, minCohd, maxCohd, minNua, maxNua, x0, xAxes, y0, yAxes);
-  // filtra i paesi per l'year 2019
-  countriesByYear = yearData.filterCountriesByYear(year);
-  countriesByYear.sort(function (a, b) { return b.d - a.d });
-
-  // calcolo i parametri delle forme da disegnare
-  for (let country of countriesByYear) {
-    // associo una proprietà aggiuntiva a ciascun oggetto country 
-    // per contenere i punti della macchia  
-    country.shapePoints = calculateShapePoints(country.x, country.y, country.d);
-    country.gradientPoints = calculateGradient(country.d);
-    country.grayScale = 100;
-    country.alpha = 40;
-    country.grainDots = calculateGrain(country.x, country.y, country.d, country.shapePoints, country.grayScale, country.alpha);
-  }
-}
-function calculateShapePoints(x, y, d) {
-  let points = [];
-  let noiseScale = 0.25;
-  let radius = d / 2;
-  // per emma: prova a farlo in 2D 
-  for (let angle = 0; angle < TWO_PI; angle += 0.1) {
-
-    let dx = cos(angle) * radius;
-    let dy = sin(angle) * radius;
-    // aggiungo una randomicità ai valori dati a noise per far si che le macchie non siano speculari rispetto all'asse y
-    let noiseFactor = map(noise(dx * noiseScale + random(-1, 1), dy * noiseScale + random(-1, 1)), 0, 1, 1, 1.1);
-    points.push({
-      x: x + dx * noiseFactor,
-      y: y + dy * noiseFactor
-    });
-  }
-  return points;
-}
-function calculateGradient(d) {
-  let gradientPoints = [];
-  let gradientX = random(-d / 2, d / 2);
-  let gradientY = random(-d / 2, d / 2);
-
-  gradientPoints.push({
-    x: gradientX,
-    y: gradientY
-  })
-  return gradientPoints;
-}
-
-// https://editor.p5js.org/lazydistribution/sketches/nB-VddIvd
-function calculateGrain(x, y, d, shapePoints, grayScale, alpha) {
-  const topLeftX = x - d;
-  const topLeftY = y - d;
-  const size = Math.ceil(d);
-
-  // pg = immagine
-  let pg = createGraphics(size * 2, size * 2);
-  pg.pixelDensity(1);
-  pg.loadPixels();
-
-  // https://developer.mozilla.org/en-US/docs/Glossary/Identifier 
-	// identifiers (_x, _y) sono utilizzati come loop Counters
-  for (var _y = 0; _y < size * 2; _y += 1) {
-    for (var _x = 0; _x < size * 2; _x += 1) {
-      // controllo se il punto è interno alla forma del paese
-      if (!isPointInsideShape(shapePoints, topLeftX + _x, topLeftY + _y)) {
-        continue;
-      }
-
-      let i = (_x + _y * size * 2) * 4;
-
-      // grigio (0-255)
-      let value = random(grayScale);
-      pg.pixels[i] = value;
-      pg.pixels[i + 1] = value;
-      pg.pixels[i + 2] = value;
-
-      // trasparenza (alpha) (0-255)
-      pg.pixels[i + 3] = alpha;
-    }
-  }
-  pg.updatePixels();
-
-  return pg;
-}
-// GRANA (come immagine)
-// Ray casting algorithm per far si che i punti della texture siano generati solo all'interno del paese
-// reference: https://en.wikipedia.org/wiki/Point_in_polygon 
-function isPointInsideShape(shapePoints, x, y) {
-  let inside = false;
-  for (let i = 0, j = shapePoints.length - 1; i < shapePoints.length; j = i++) {
-    let xi = shapePoints[i].x, yi = shapePoints[i].y;
-    let xj = shapePoints[j].x, yj = shapePoints[j].y;
-
-    let intersect = ((yi > y) !== (yj > y)) &&
-      (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
-    if (intersect) inside = !inside;
-  }
-  return inside;
-}
-
 function manageLegend() {
   let legend = [
-    { label: "High income", color: incomeColors[3], stroke: strokeIncomeColors[3] },
-    { label: "Upper middle income", color: incomeColors[2], stroke: strokeIncomeColors[2] },
-    { label: "Lower middle income", color: incomeColors[1], stroke: strokeIncomeColors[1] },
-    { label: "Low income", color: incomeColors[0], stroke: strokeIncomeColors[0] },
+    { label: "High Income", color: incomeColors[3], stroke: strokeIncomeColors[3] },
+    { label: "Upper Middle Income", color: incomeColors[2], stroke: strokeIncomeColors[2] },
+    { label: "Lower Middle Income", color: incomeColors[1], stroke: strokeIncomeColors[1] },
+    { label: "Low Income", color: incomeColors[0], stroke: strokeIncomeColors[0] },
     { label: "No Data", color: noDataColor, stroke: noDataColor[2] },
-    { label: "Number of people who do not\nhave access to a healthy diet", color: ["black", "black"], outline: true },
+    { label: "Number of people who did not\nhave access to a healthy diet", color: [baseColor, baseColor], outline: true },
   ]
 
   // legenda
-  let legendHeightOffset = 45;
   legendX = windowWidth * (p1 - spacing) - btnWidth / 2;
   legendSize = width * 0.015;
+  let legendHeightOffset = 45;
   let x = legendX + legendSize / 2; //x iniziale legenda
   let y = y0 + legendSize / 2;
 
@@ -366,7 +260,6 @@ function manageLegend() {
     });
   }
 }
-
 function drawTitle() {
   push();
   fill(baseColor);
@@ -378,6 +271,104 @@ function drawTitle() {
   titleWidth = textWidth(title)
   text(title, windowWidth / 2, height * 0.03);
   pop();
+}
+function manageCountry() {
+  yearData = new countryFilter(tableObj, minCohd, maxCohd, minNua, maxNua, x0, xAxes, y0, yAxes);
+  // filtra i paesi per l'year 2019
+  countriesByYear = yearData.filterCountriesByYear(year);
+  // ordino gli elementi per poterli disegnare dal più grande al più piccolo in seguito
+  countriesByYear.sort(function (a, b) { return b.d - a.d });
+
+  // calcolo i parametri delle forme da disegnare
+  for (let country of countriesByYear) {
+    // associo una proprietà aggiuntiva a ciascun oggetto country 
+    // per contenere i punti della macchia  
+    country.shapePoints = calculateShapePoints(country.x, country.y, country.d);
+    country.gradientPoints = calculateGradient(country.d);
+    country.grayScale = 100;
+    country.alpha = 40;
+    country.grainDots = calculateGrain(country.x, country.y, country.d, country.shapePoints, country.grayScale, country.alpha);
+  }
+}
+function calculateShapePoints(x, y, d) {
+  let points = [];
+  let noiseScale = 0.25;
+  let radius = d / 2;
+  // per emma: prova a farlo in 2D 
+  for (let angle = 0; angle < TWO_PI; angle += 0.1) {
+
+    let dx = cos(angle) * radius;
+    let dy = sin(angle) * radius;
+    // aggiungo una randomicità ai valori dati a noise per far si che le macchie non siano speculari rispetto all'asse y
+    let noiseFactor = map(noise(dx * noiseScale + random(-1, 1), dy * noiseScale + random(-1, 1)), 0, 1, 1, 1.1);
+    points.push({
+      x: x + dx * noiseFactor,
+      y: y + dy * noiseFactor
+    });
+  }
+  return points;
+}
+function calculateGradient(d) {
+  let gradientPoints = [];
+  let gradientX = random(-d / 2, d / 2);
+  let gradientY = random(-d / 2, d / 2);
+
+  gradientPoints.push({
+    x: gradientX,
+    y: gradientY
+  })
+  return gradientPoints;
+}
+// https://editor.p5js.org/lazydistribution/sketches/nB-VddIvd
+function calculateGrain(x, y, d, shapePoints, grayScale, alpha) {
+  const topLeftX = x - d;
+  const topLeftY = y - d;
+  const size = Math.ceil(d);
+
+  // pg = immagine
+  let pg = createGraphics(size * 2, size * 2);
+  pg.pixelDensity(1);
+  pg.loadPixels();
+
+  // https://developer.mozilla.org/en-US/docs/Glossary/Identifier 
+	// identifiers (_x, _y) sono utilizzati come loop Counters
+  for (var _y = 0; _y < size * 2; _y += 1) {
+    for (var _x = 0; _x < size * 2; _x += 1) {
+      // controllo se il punto è interno alla forma del paese
+      if (!isPointInsideShape(shapePoints, topLeftX + _x, topLeftY + _y)) {
+        continue;
+      }
+
+      let i = (_x + _y * size * 2) * 4;
+
+      // grigio (0-255)
+      let value = random(grayScale);
+      pg.pixels[i] = value;
+      pg.pixels[i + 1] = value;
+      pg.pixels[i + 2] = value;
+
+      // trasparenza (alpha) (0-255)
+      pg.pixels[i + 3] = alpha;
+    }
+  }
+  pg.updatePixels();
+
+  return pg;
+}
+// GRANA (come immagine)
+// Ray casting algorithm per far si che i punti della texture siano generati solo all'interno del paese
+// reference: https://en.wikipedia.org/wiki/Point_in_polygon 
+function isPointInsideShape(shapePoints, x, y) {
+  let inside = false;
+  for (let i = 0, j = shapePoints.length - 1; i < shapePoints.length; j = i++) {
+    let xi = shapePoints[i].x, yi = shapePoints[i].y;
+    let xj = shapePoints[j].x, yj = shapePoints[j].y;
+
+    let intersect = ((yi > y) !== (yj > y)) &&
+      (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+    if (intersect) inside = !inside;
+  }
+  return inside;
 }
 
 // ho calcolato tutte le variabili per poter disegnare tutto
@@ -391,8 +382,8 @@ function draw() {
   let nineOutOf10 = map(9, 0, 10, y0, yAxes);
 
   // drawThreshold(total, colored, x0, y, size, label)
-  drawThreshold(10, 5, x0, fiveOutOf10, 4.5, "5+ out of 10 people have\nno access to a healthy diet");
-  drawThreshold(10, 9, x0, nineOutOf10, 4.5, "9+ out of 10 people have\nno access to a healthy diet");
+  drawThreshold(10, 5, x0, fiveOutOf10, 4.5, "5+ out of 10 people had\nno access to a healthy diet");
+  drawThreshold(10, 9, x0, nineOutOf10, 4.5, "9+ out of 10 people had\nno access to a healthy diet");
 
   // header
   drawTitle();
@@ -426,7 +417,7 @@ function draw() {
   }
 }
 
-//disegno bottoni per cambio grafico in base all'anno
+//disegno bottoni per cambiare grafico in base all'anno
 function drawYearButtons(txtSize, w, h) {
   bPadding = (titleWidth - (4 * w)) / 3;
   totalWidth = titleWidth;
@@ -460,8 +451,6 @@ function drawYearButtons(txtSize, w, h) {
     pop();
   }
 }
-
-
 function drawLegend() {
   // disegno i glifi della legenda
   // testi income
@@ -531,7 +520,7 @@ function drawLegend() {
   textAlign(LEFT, BASELINE);
   textSize(txtSize);
   noStroke();
-  text("No Data for " + cemeteryShapes.length + " countries in " + year, legendX, nineOutOf10Row);
+  text("No data for " + cemeteryShapes.length + " countries in " + year, legendX, nineOutOf10Row);
   pop()
 }
 function drawAxes() {
@@ -583,22 +572,16 @@ function drawGlyph(x, y, d, shapePoints, gradientPoints, grainDots, strokeColor,
   }
   stroke(strokeColor);
 
+  // il gradiente viene applicato a partire dalle coordinate specificate 
+  // le coordinate di default sono il centro della figura
   if (!outline) {
-    // gradiente
-    for (let point of gradientPoints) {
-      // il gradiente viene applicato a partire dalle coordinate specificate 
-      // le coordinate di default sono il centro della figura
+    gradientPoints.forEach(point => {
       fillGradient('radial', {
-        // from/to: [x, y, raggio]
         from: [x + point.x, y + point.y, d / 15],
         to: [x + point.x, y + point.y, d / 1],
-        steps: [
-          startColor,
-          endColor,
-        ]
+        steps: [startColor, endColor],
       });
-
-    }
+    });
   } else {
     noFill();
     stroke(startColor);
@@ -625,7 +608,6 @@ function glyphHover() {
   // se il mouse è sopra a country.x-country.d/2 e country.x+country.d/2 e 
   // country.y-country.d/2 e country.y+country.d/2
   //  --> fai apparire un testo con country.name
-
   hoveringCountry = null;
   for (let i = countriesByYear.length - 1; i >= 0; i--) {
     let country = countriesByYear[i];
@@ -644,6 +626,7 @@ function glyphHover() {
         vertex(p.x, p.y);
       }
       endShape(CLOSE);
+      // testi informazioni paese 
       push();
       noStroke();
       fill(baseColor);
@@ -661,7 +644,7 @@ function glyphHover() {
       text(country.name, textX, country.y - interlinea * 1.5);
       textSize(0.010 * width);
       // info paese hover
-      let incomes = ["Low income", "Lower middle income", "Upper middle income", "High income"];
+      let incomes = ["Low Income", "Lower Middle Income", "Upper Middle Income", "High Income"];
 
       text("COHD: " + country.cohd + " USD", textX, country.y + interlinea);
       text("PUA: " + country.pua + " %", textX, country.y + interlinea * 2);
@@ -690,7 +673,6 @@ function mousePressed() {
       selectedCountry = null;
     }
   }
-
   // bottoni anni
   for (let i = 0; i < years.length; i++) {
     xB = startX + i * (btnWidth + bPadding);
@@ -709,15 +691,12 @@ function isMouseInsideCountry(country) {
     (mouseY > country.y - country.d / 2)
   );
 }
-
 function drawFocus() {
-  //sfondo opacizzato
+  // sfondo opacizzato
   push();
   fill(bgColor);
   rect(0, 0, width, height);
-  pop();
-
-  push();
+  // disegno "macchia" sottostante
   drawGlyph(
     focusGlyphX,
     focusGlyphY,
@@ -730,9 +709,8 @@ function drawFocus() {
     incomeColors[selectedCountry.income - 1][1] + "50"
   );
   pop();
-
+  // salvo i dati del paese selezionato per ogni anno
   let focusedCountryData = yearData.focusData();
-
   //titolo paese del focus
   textSize(0.025 * width);
   noStroke();
@@ -759,14 +737,14 @@ function drawFocus() {
   fill(baseColor);
   textSize(0.01 * width);
   textAlign(CENTER);
-  text("Percentage of the population\nthat can afford a healthy diet", leftX, groupY + 40);
+  text("Percentage of the population\nthat could afford a healthy diet", leftX, groupY + 40);
 
   // gruppo centrale 
   fill(incomeColors[selectedCountry.income - 1][1]);
   circle(middleX, groupY, circleSize);
 
   fill(baseColor);
-  text("Percentage of the population\nthat cannot afford a healthy diet", middleX, groupY + 40);
+  text("Percentage of the population\nthat could not afford a healthy diet", middleX, groupY + 40);
 
   // gruppo a destra
   let rectWidth = 0.2 * height;
@@ -785,7 +763,7 @@ function drawFocus() {
 
   // testo finale
   textSize(0.012 * width);
-  text("Number of people who didn't have access to a healthy diet", width / 2, height - 100);
+  text("Number of people who did not have access to a healthy diet", width / 2, height - 100);
 
   // bottone chiusura focus
   noFill();
@@ -798,7 +776,6 @@ function drawFocus() {
   line(xClose + sClose, yClose, xClose, yClose + sClose);
 
 }
-
 // disegno omini (riempiti e vuoti) per soglie grafico
 function drawPeople(total, colored, x, y, size) {
   stroke(baseColor);
@@ -824,7 +801,6 @@ function drawPeople(total, colored, x, y, size) {
     x += size * 1.77;
   }
 }
-
 // disegno delle soglie sul grafico
 function drawThreshold(total, colored, x0, y, size, label) {
   // linea
@@ -851,7 +827,6 @@ function drawThreshold(total, colored, x0, y, size, label) {
   textSize(txtSize * 0.66);
   text(label, startX, y);
 }
-
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
   // ridefinisco i parametri anche quando windowResize non solo quando si ricarica la pagina:

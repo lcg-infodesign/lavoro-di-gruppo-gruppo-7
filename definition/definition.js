@@ -63,7 +63,7 @@ function updateButton() {
 function link(){
 
   // link in basso con posizionamento CSS fisso
-  datasetLink = createA('https://www.fao.org/faostat/en/#data/CAHD', 'Full dataset is available here', '_blank');//collegamento
+  datasetLink = createA('https://www.fao.org/faostat/en/#data/CAHD', 'Full dataset available here', '_blank');//collegamento
   datasetLink.style('position', 'absolute');
   datasetLink.style('bottom', `${width * 0.023}px`);
   datasetLink.style('left', '50%');
@@ -96,13 +96,15 @@ function draw() {
   ];
 
   let paragraphs = [
-    "The cost of a healthy diet indicator is the cost of purchasing the least expensive locally available foods to meet requirements for energy and food-based dietary guidelines (FBDGs), for a representative person within energy balance at 2330 kcal/day. The unit of measurement is dollars per person per day.",
+    "The indicator represents the cost of purchasing the least expensive locally available foods to meet requirements for energy and food-based dietary guidelines (FBDGs), for a representative person within energy balance at 2330 kcal/day. The unit of measurement is dollars per person per day.",
     "The indicator measures the percentage of people whose disposable income, after covering basic non-food necessities, is insufficient to afford the least-cost healthy diet. It is calculated by adding the cost of a healthy diet (CoHD) to the cost of basic non-food goods and services to set a threshold.",
-    "The indicator estimates the total number of people who are unable to afford a healthy diet. The NUA indicator is computed by multiplying PUA by the reference population size taken from the 2022 revision of the World Population Prospects.",
+    "The indicator estimates the total number of people who are unable to afford a healthy diet. The NUA indicator is computed by multiplying PUA by the reference population size of each year, taken from the 2022 revision of the World Population Prospects.",
     "The cost of a healthy diet is converted to international dollars using purchasing power parity (PPP).",
-    "Countries are categorized into four income levels: low-income, lower-middle-income, upper-middle-income, and high-income. Each level reflects the country's ability to provide access to resources like a healthy diet, with lower-income nations facing greater challenges.",
-    "The values for CoHD, PUA, or NUA are missing for some countries in the dataset, so they are represented outside of our chart.",
+    "Countries are categorized into four income levels: low, lower middle, upper middle, and high income. Each level reflects the country's ability to provide access to resources like a healthy diet, with lower income nations facing greater challenges.",
+    "The countries with missing values for CoHD, PUA, and NUA are represented outside the main chart."
   ];
+  // The countries with missing values for CoHD, PUA, and NUA are represented outside the main chart
+
   // riga
   for (let row = 0; row < 3; row++) {
     let yOffset = startY + row * (height * 0.25 + rowSpacing);

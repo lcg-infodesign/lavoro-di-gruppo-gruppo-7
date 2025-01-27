@@ -9,10 +9,6 @@ class countryFocus {
 		this.height = height;
 	}
 
-	setLineDash(list) {
-		drawingContext.setLineDash(list);
-	}
-
 	// cerchio sotto scuro
 	// cerchio trasparente - pua (map)
 	// cerchio solo contorno fuori --> map sul cohd (dashed)
@@ -27,7 +23,6 @@ class countryFocus {
 		let diameter = 0.12 * this.width;
 		let t2Distance = 0.1 * this.width;
 		let t3Distance = 0.15 * this.width;
-
 		let timelineY;
 
 		push();
@@ -72,7 +67,7 @@ class countryFocus {
 				circle(0, 0, diameter);
 
 				fill(baseColor);
-				textSize(0.017 * this.width);
+				textSize(0.015 * this.width);
 				text("No Data", 0, t3Distance + 10);
 				pop();
 			}
