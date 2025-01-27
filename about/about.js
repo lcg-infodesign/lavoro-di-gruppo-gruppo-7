@@ -16,11 +16,11 @@ function preload() {
   team.forEach(member => images.push(loadImage(member.image)));
 }
 
-//bottoni nel setup per no loop
+//bottoni nel setup 
 function setup() {
   createCanvas(windowWidth, windowHeight);
 
-  let buttonLabels = ['Our team', 'Definitions', 'Show Chart', 'Introduction'];
+  let buttonLabels = ['About', 'Definitions', 'Show Chart', 'Introduction'];
   let buttonLinks = [
     '../about/about.html',
     '../definition/definition.html',
@@ -69,7 +69,7 @@ function updateButton() {
     });
   });
 }
-// team griglia e nomi
+// team griglia e testi
 function Team() {
   let spacingX = width / 5;
   let spacingY = height / 4;
@@ -103,7 +103,7 @@ function Team() {
 function draw() {
   background('#FFF2E4');
 
-  // colonna sinistra
+  // style titoli
   fill('#984E4E');
   textFont('Georgia');
   textAlign(LEFT, TOP);
@@ -111,7 +111,8 @@ function draw() {
   textStyle(BOLD);
   text('Our project', width * 0.1, height * 0.1);
   text('Our team', width * 0.55, height * 0.1);
-  // colonna destra
+  
+  // style paragrafi
   textStyle(NORMAL);
   textSize(width * 0.011);
   textWrap(WORD);
@@ -119,7 +120,7 @@ function draw() {
   text('We are a team of seven students from Politecnico di Milano, united by a passion for data analysis and its potential to address global challenges. Our goal is to apply a rigorous approach to dataset analysis, transforming complex data into actionable knowledge to create a positive and transformative impact.', width * 0.55, height * 0.17, width * 0.35);
 
 
-  // linea
+  // linea divisoria
   stroke('#984E4E');
   strokeWeight(1);
   line(width * 0.5, height * 0.1, width * 0.5, height * 0.3);

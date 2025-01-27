@@ -23,10 +23,10 @@
 	}
 }
 
+/* classi per l'implementazione delle animazioni */
 .fade-out-class {
 	animation: fade-out 700ms 1;
 }
-
 .fade-in-class {
 	animation: fade-in 700ms 1;
 }
@@ -56,6 +56,7 @@ canvas {
 	top: 0;
 }
 
+/* gruppo indicatori sketch */
 #sketch-list {
 	display: flex;
 	flex-direction: column;
@@ -68,6 +69,7 @@ canvas {
 	left: 50px;
 }
 
+/* indicatore sketch */
 .sketch-button {
 	width: 15px;
 	height: 15px;
@@ -78,11 +80,11 @@ canvas {
 	border: 1px solid var(--fgColor);
 	border-radius: 7.5px;
 }
-
 .sketch-button:not(:first-child) {
 	margin-top: 10px;
 }
 
+/* proprietà generali dei bottoni */
 .buttons {
 	width: 140px;
 	height: 60px;
@@ -97,16 +99,26 @@ canvas {
 	border: none;
 }
 
+/* bottone per passare allo sketch successivo */
 #forward {
 	background-color: #FFF2E400;
 }
 
+/* bottone per passare al grafico */
 #leave {
+	width: 12vw;
+	height: 6vh;
+
 	display: none;
 
+	background-color: var(--bgColor);
+	color: var(--fgColor);
+
+	font-size: 1.5vw;
+	border: 1px solid var(--fgColor);
+	border-radius: 10px;
+}
+#leave:hover {
 	background-color: var(--fgColor);
 	color: var(--bgColor);
-
-	font-size: 18px;
-	border-radius: 10px;
 }

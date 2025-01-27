@@ -1,24 +1,24 @@
-// In caso di aggiornamento della pagina questa viene riportata all'inizio
+// in caso di aggiornamento della pagina questa viene riportata all'inizio
 if(sessionStorage.getItem("visited")) {
 	window.scrollTo(0, 0);
 } else {
 	sessionStorage.setItem("visited", "false");
 }
 
-// Tracciamento degli sketch
+// tracciamento degli sketch
 let currentSketch = 0;
 const totalSketches = 6;
 
-// Array degli sketch
+// array degli sketch
 let sketches = document.getElementsByClassName("sketch");
 
-// Bottone per lo sketch seguente
+// bottone per lo sketch seguente
 let forwardButton = document.getElementById("forward");
 forwardButton.addEventListener("click", () => {
 	changeSketch(currentSketch + 1);    
 });
 
-// Gestione della pressione del tasto freccia giù
+// gestione della pressione dei tasti freccia giù e freccia su
 function arrows(event) {
 	if (event.repeat) return;
 	if (event.key === 'ArrowDown' && currentSketch < totalSketches) {
@@ -29,7 +29,7 @@ function arrows(event) {
 }
 document.addEventListener("keydown", arrows);
 
-// Array degli indicatori di selezione sketch
+// array degli indicatori di selezione sketch
 let sketchButtons = document.getElementsByClassName("sketch-button");
 sketchButtons[currentSketch].style.backgroundColor = "var(--fgColor)";
 Array.from(sketchButtons).forEach((sketchButton, i) => {
@@ -38,12 +38,13 @@ Array.from(sketchButtons).forEach((sketchButton, i) => {
 	});
 });
 
-// Bottone per abbandonare la narrazione
+// bottone per abbandonare la narrazione
 let leaveButton = document.getElementById("leave");
 
-// Funzione per il cambio di sketch
+// funzione per il cambio di sketch
 function changeSketch(selectedSketch) {
 	if(selectedSketch !== currentSketch && selectedSketch <= totalSketches) {
+		// gestione bottone di accesso alla data visualization
 		if(selectedSketch === 6) {
 			forwardButton.style.display = "none";
 			leaveButton.style.display = "block";
@@ -65,7 +66,7 @@ function changeSketch(selectedSketch) {
 		sketches[currentSketch].classList.add("fade-out-class");
 		sketches[selectedSketch].classList.add("fade-in-class");
 
-		// disattivazione bottone per lo sketch seguente + indicatori
+		// disattivazione bottone per lo sketch seguente + indicatori + frecce
 		forwardButton.disabled = true;
 		Array.from(sketchButtons).forEach((sketchButton) => {
 			sketchButton.disabled = true;
@@ -74,7 +75,7 @@ function changeSketch(selectedSketch) {
 
 		// rimozione sketch precedente
 		setTimeout(() => {
-			// sketch precedente  nascosto
+			// sketch precedente nascosto
 			sketches[currentSketch].hidden = true;
 
 			// disattivo animazioni
@@ -86,10 +87,11 @@ function changeSketch(selectedSketch) {
 		setTimeout(() => {
 			sketches[selectedSketch].classList.remove("fade-in-class");
 
+			// aggiornamento sketch corrente
 			currentSketch = selectedSketch;
 		}, 700);
 
-		// riattivazione  bottone + indicatori
+		// riattivazione bottone + indicatori + frecce
 		setTimeout(() => {
 			forwardButton.disabled = false;
 			Array.from(sketchButtons).forEach((sketchButton, index) => {
@@ -99,7 +101,3 @@ function changeSketch(selectedSketch) {
 		}, 1000);
 	}
 }
-
-leaveButton.addEventListener("click", () => {
-	window.location = "chart/2019/index2019.html"
-})

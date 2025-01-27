@@ -73,7 +73,7 @@ class countryFocus {
 
 				fill(baseColor);
 				textSize(0.017 * this.width);
-				text("No data", 0, t3Distance + 10);
+				text("No Data", 0, t3Distance + 10);
 				pop();
 			}
 
@@ -104,7 +104,7 @@ class countryFocus {
 				textAlign(CENTER, BOTTOM);
 				textSize(0.01 * this.width);
 				fill(baseColor);
-				text("No data", barX + barWidth / 2, barY - 10);
+				text("No Data", barX + barWidth / 2, barY - 10);
 				pop();
 
 				fill(noDataColor[1]);

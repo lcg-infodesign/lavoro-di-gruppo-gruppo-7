@@ -8,7 +8,7 @@ let buttons = [];
 function setup() {
   createCanvas(windowWidth, windowHeight);
 
-let buttonLabels = ['Our team', 'Definitions', 'Show Chart', 'Introduction'];
+let buttonLabels = ['About', 'Definitions', 'Show Chart', 'Introduction'];
 let buttonLinks = [
   '../about/about.html',
   '../definition/definition.html',
@@ -65,7 +65,7 @@ function link(){
   // link in basso con posizionamento CSS fisso
   datasetLink = createA('https://www.fao.org/faostat/en/#data/CAHD', 'Full dataset is available here', '_blank');//collegamento
   datasetLink.style('position', 'absolute');
-  datasetLink.style('bottom', `${width * 0.03}px`);
+  datasetLink.style('bottom', `${width * 0.023}px`);
   datasetLink.style('left', '50%');
   datasetLink.style('transform', 'translateX(-50%)');
   datasetLink.style('font-family', 'Georgia');
@@ -87,21 +87,21 @@ function draw() {
   let rowSpacing = height * 0.05;
   let startY = height * 0.1;
   let titles = [
-    "CoHD: Cost of a healthy diet",
-    "PUA: Prevalence of unaffordability",
-    "NUA: People unable to afford a healthy diet",
-    "USD: United States dollar",
-    "INCOME: Income levels",
-    "NO VALUE: Countries with no value",
+    "CoHD: Cost of a Healthy Diet",
+    "PUA: Prevalence of Unaffordability",
+    "NUA: People Unable to Afford Healthy Diet",
+    "USD: United States Dollar",
+    "Income: Income Levels",
+    "No Data: Countries with no Values",
   ];
 
   let paragraphs = [
-    "The cost of a healthy diet indicator is the cost of purchasing the least expensive locally available foods to meet requirements for energy and food-based dietary guidelines (FBDGs), for a representative person within energy balance at 2330 kcal/day. The unit of measurement is PPP dollars per person per day.",
+    "The cost of a healthy diet indicator is the cost of purchasing the least expensive locally available foods to meet requirements for energy and food-based dietary guidelines (FBDGs), for a representative person within energy balance at 2330 kcal/day. The unit of measurement is dollars per person per day.",
     "The indicator measures the percentage of people whose disposable income, after covering basic non-food necessities, is insufficient to afford the least-cost healthy diet. It is calculated by adding the cost of a healthy diet (CoHD) to the cost of basic non-food goods and services to set a threshold.",
     "The indicator estimates the total number of people who are unable to afford a healthy diet. The NUA indicator is computed by multiplying PUA by the reference population size taken from the 2022 revision of the World Population Prospects.",
     "The cost of a healthy diet is converted to international dollars using purchasing power parity (PPP).",
     "Countries are categorized into four income levels: low-income, lower-middle-income, upper-middle-income, and high-income. Each level reflects the country's ability to provide access to resources like a healthy diet, with lower-income nations facing greater challenges.",
-    "The values for CoHD, PUA, or NUA are missing for some countries in the dataset, so they are represented outside of our graph.",
+    "The values for CoHD, PUA, or NUA are missing for some countries in the dataset, so they are represented outside of our chart.",
   ];
   // riga
   for (let row = 0; row < 3; row++) {

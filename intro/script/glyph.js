@@ -1,3 +1,12 @@
+// FILE DESCRIPTION
+// file che permette di avere lo stesso glifo presente nel grafico principale: ../chart/chart.js
+// permette di disegnare i paesi con forme irregolari (noise), con gradiente (libreria p5.fillGradient.js) e una texture (grana).
+
+
+// isPointInsideShape()
+// 		algoritmo che verifica se il punto è interno alla forma
+//		 uso del "Ray casting algorithm" per verificare che i punti della texture siano generati solo all'interno del paese
+// 		reference: https://en.wikipedia.org/wiki/Point_in_polygon 
 function isPointInsideShape(shapePoints, x, y) {
 	let inside = false;
 	for (let i = 0, j = shapePoints.length - 1; i < shapePoints.length; j = i++) {
@@ -14,12 +23,12 @@ function isPointInsideShape(shapePoints, x, y) {
 function stain(p, centerX, centerY, radius, innerColor, outerColor) {
 	let pointsShape = [];
 	let noiseScale = 0.25;
-	// NOISE per creare punti della forma del paese
+	// disegnare i paesi con forme irregolari (noise)
 	for (let angle = 0; angle < p.TWO_PI; angle += 0.1) {
 		let dx = p.cos(angle) * radius;
 		let dy = p.sin(angle) * radius;
 		// aggiungo una randomicità ai valori dati a noise per far si che le macchie non siano speculari rispetto all'asse y
-		let noiseFactor = p.map(p.noise(dx * noiseScale + p.random(-1, 1), dy * noiseScale + p.random(-1, 1)), 0, 1, 1, 1.05);
+		let noiseFactor = p.map(p.noise(dx * noiseScale + p.random(-1, 1), dy * noiseScale + p.random(-1, 1)), 0, 1, 1, 1.1);
 		pointsShape.push({
 			x: centerX + dx * noiseFactor,
 			y: centerY + dy * noiseFactor
@@ -64,11 +73,10 @@ function stain(p, centerX, centerY, radius, innerColor, outerColor) {
 	pg.pixelDensity(1);
 	pg.loadPixels();
 
+	// https://developer.mozilla.org/en-US/docs/Glossary/Identifier 
+	// identifiers (_x, _y) == loop Counters
 	for (let _y = 0; _y < size * 2; _y += 1) {
 		for (let _x = 0; _x < size * 2; _x += 1) {
-			// algoritmo che verifica se il punto è interno alla forma
-			// uso del "Ray casting algorithm" per verificare che i punti della texture siano generati solo all'interno del paese
-			// reference: https://en.wikipedia.org/wiki/Point_in_polygon 
 			if (!isPointInsideShape(pointsShape, topLeftX + _x, topLeftY + _y)) {
 				continue;
 			}
@@ -82,11 +90,10 @@ function stain(p, centerX, centerY, radius, innerColor, outerColor) {
 			pg.pixels[i + 2] = value;
 
 			// trasparenza (alpha) (0-255)
-			pg.pixels[i + 3] = 50;
+			pg.pixels[i + 3] = 20;
 		}
 	}
 	pg.updatePixels();
-
 	//disegnare la forma del paese (macchia)
 	p.beginShape();
 	for (let pt of pointsShape) {

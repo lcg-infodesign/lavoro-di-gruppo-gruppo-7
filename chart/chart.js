@@ -4,7 +4,7 @@ let tableObj;
 let nRows;
 let years = ["2019", "2020", "2021", "2022"]
 let year = years[0];
-let font = "Georgia, serif";
+let font = "Georgia";
 // parametri 
 let Cohd;
 let minCohd;
@@ -53,7 +53,8 @@ let bgColor = ("#FFF2E4");
 let titleColor = ("#794242");
 let baseColor = ("#984E4E")
 let incomeColors = [["#be7fb6", "#7c2b82"], ["#D38EA6", "#9a4267"], ["#F6AD7A", "#d3741c"], ["#fede7a", "#f0c715"]];
-let noDataColor = ["#FFFFFF", "#ced0d4"];
+let strokeIncomeColors = ["#6a2775", "#8b4062", "#ad6936", "#dab61c"]
+let noDataColor = ["#FFFFFF", "#ced0d4", "#939393"];
 let puaColor = ("#FFFFFF80");
 
 // valori per il glifo di sfondo sul focus
@@ -76,10 +77,11 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   frameRate(60)
 
+
   // bottoni di navigazione
   buttons.forEach(btn => btn.remove());
   buttons = [];
-  let buttonLabels = ['Our team', 'Definitions', 'Show Chart', 'Introduction'];
+  let buttonLabels = ['About', 'Definitions', 'Show Chart', 'Introduction'];
   let buttonLinks = [
     '../about/about.html',
     '../definition/definition.html',
@@ -122,7 +124,7 @@ function updateNavButtons(p1, p2, p3, p4, w, h, txtSize) {
   let pos = [p1, p2, p3, p4];
   buttons.forEach((btn, i) => {
     btn.style('color', '#984E4E');
-    btn.style('font-family', 'Georgia, serif');
+    btn.style('font-family', font);
     btn.style('font-size', `${txtSize}px`);
     btn.position(width * pos[i] - w / 2, height * 0.03);
     btn.size(w, h);
@@ -160,33 +162,24 @@ function manageData() {
   // min max costo
   minCohd = Number(tableObj[0].cohd);
   maxCohd = Number(tableObj[0].cohd);
-
-  for (let row of table.rows) {
-    Cohd = row.getNum('cohd');
-    minCohd = min(minCohd, Cohd);
-    maxCohd = max(maxCohd, Cohd);
-  }
-  // min max Nua
   minNua = Infinity;
   maxNua = 0;
-  for (let i = 0; i < nRows; i++) {
-    let Nua = Number(tableObj[i].nua);
+  minPua = Infinity;
+  maxPua = 0;
+  // cerco minimo e massimo delle colonne del dataset utili a mappare gli elemnenti:
+  for (let row of table.rows) {
+    Cohd = row.getNum('cohd');
+    Pua = row.getNum('pua');
+    Nua = row.getNum('nua');
+
+    minCohd = min(minCohd, Cohd);
+    maxCohd = max(maxCohd, Cohd);
     if ((Nua != 0) && (Nua < minNua)) {
       minNua = Nua;
     }
     if (Nua > maxNua) {
       maxNua = Nua;
     }
-  }
-  // ricavo colonna valori pua
-  for (let row of table.rows) {
-    Pua = row.getNum('pua');
-  }
-  // min max Pua
-  minPua = Infinity;
-  maxPua = 0;
-  for (let i = 0; i < nRows; i++) {
-    let Pua = Number(tableObj[i].pua);
     if ((Pua != 0) && (Pua < minPua)) {
       minPua = Pua;
     }
@@ -201,10 +194,10 @@ function manageAxes() {
   //coeff di y0 preso proporzionalmente dalla base di progetto realizzata su Figma 
   y0 = 0.122 * windowHeight;
   //asse x: la sua dimensione dipende dalla dimensioen del titolo
+  textFont("Georgia")
   drawTitle();
 
   xAxes = width / 2 + titleWidth / 2;
-  // xAxes = width - 380;
   //asse y 
   yAxes = windowHeight - y0 / 2 - 30;
 }
@@ -212,7 +205,6 @@ function manageCountry() {
   yearData = new countryFilter(tableObj, minCohd, maxCohd, minNua, maxNua, x0, xAxes, y0, yAxes);
   // filtra i paesi per l'year 2019
   countriesByYear = yearData.filterCountriesByYear(year);
-  // console.log("Filtered countries:", countriesByYear);
   countriesByYear.sort(function (a, b) { return b.d - a.d });
 
   // calcolo i parametri delle forme da disegnare
@@ -267,9 +259,11 @@ function calculateGrain(x, y, d, shapePoints, grayScale, alpha) {
   pg.pixelDensity(1);
   pg.loadPixels();
 
+  // https://developer.mozilla.org/en-US/docs/Glossary/Identifier 
+	// identifiers (_x, _y) sono utilizzati come loop Counters
   for (var _y = 0; _y < size * 2; _y += 1) {
     for (var _x = 0; _x < size * 2; _x += 1) {
-      // check if the point is inside the shape
+      // controllo se il punto è interno alla forma del paese
       if (!isPointInsideShape(shapePoints, topLeftX + _x, topLeftY + _y)) {
         continue;
       }
@@ -308,11 +302,11 @@ function isPointInsideShape(shapePoints, x, y) {
 
 function manageLegend() {
   let legend = [
-    { label: "High income", color: incomeColors[3] },
-    { label: "Upper middle income", color: incomeColors[2] },
-    { label: "Lower middle income", color: incomeColors[1] },
-    { label: "Low income", color: incomeColors[0] },
-    { label: "No data", color: noDataColor },
+    { label: "High income", color: incomeColors[3], stroke: strokeIncomeColors[3] },
+    { label: "Upper middle income", color: incomeColors[2], stroke: strokeIncomeColors[2] },
+    { label: "Lower middle income", color: incomeColors[1], stroke: strokeIncomeColors[1] },
+    { label: "Low income", color: incomeColors[0], stroke: strokeIncomeColors[0] },
+    { label: "No Data", color: noDataColor, stroke: noDataColor[2] },
     { label: "Number of people who do not\nhave access to a healthy diet", color: ["black", "black"], outline: true },
   ]
 
@@ -338,6 +332,7 @@ function manageLegend() {
       grainDots: grainDots,
       label: info.label,
       color: info.color,
+      stroke: info.stroke,
       outline: info.outline,
     });
     y += legendHeightOffset;
@@ -353,7 +348,6 @@ function manageLegend() {
   let nineOutOf10RowWithoutNoDataText = nineOutOf10Row - cemeteryPadding - legendSize / 2;
   let cemeteryStartHeight = nineOutOf10RowWithoutNoDataText - cemeteryRows * (cemeteryPadding + legendSize) / 2
 
-  console.log("Cemetery count:", cemeteryCount);
   cemeteryShapes = [];
   for (let i = 0; i < cemeteryCount; i++) {
     let x = legendX + legendSize / 2 + (i % cemeteryCols) * cemeteryPadding;
@@ -378,10 +372,9 @@ function drawTitle() {
   fill(baseColor);
   noStroke();
   textSize(0.027 * width);
-  textFont("Georgia");
   textAlign(CENTER, TOP);
   //https://p5js.org/reference/p5/textWidth/ 
-  let title = "Cost and Affordability of a Healthy Diet";
+  let title = "Cost and Unaffordability of a Healthy Diet";
   titleWidth = textWidth(title)
   text(title, windowWidth / 2, height * 0.03);
   pop();
@@ -390,14 +383,16 @@ function drawTitle() {
 // ho calcolato tutte le variabili per poter disegnare tutto
 function draw() {
   background(bgColor);
+  textFont(font)
   drawAxes();
   drawLegend();
 
   let fiveOutOf10 = map(5, 0, 10, y0, yAxes);
   let nineOutOf10 = map(9, 0, 10, y0, yAxes);
 
-  drawThreshold(10, 5, x0, fiveOutOf10, 8, "5+ out of 10 people have\nno access to a healthy diet");
-  drawThreshold(10, 9, x0, nineOutOf10, 8, "9+ out of 10 people have\nno access to a healthy diet");
+  // drawThreshold(total, colored, x0, y, size, label)
+  drawThreshold(10, 5, x0, fiveOutOf10, 4.5, "5+ out of 10 people have\nno access to a healthy diet");
+  drawThreshold(10, 9, x0, nineOutOf10, 4.5, "9+ out of 10 people have\nno access to a healthy diet");
 
   // header
   drawTitle();
@@ -409,7 +404,7 @@ function draw() {
 
   // dobbiamo prima calcolarci x, y, diametro per ogni paese in countriesByYear
   for (let country of countriesByYear) {
-    drawGlyph(country.x, country.y, country.d, country.shapePoints, country.gradientPoints, country.grainDots, incomeColors[country.income - 1][0], incomeColors[country.income - 1][1]);
+    drawGlyph(country.x, country.y, country.d, country.shapePoints, country.gradientPoints, country.grainDots, strokeIncomeColors[country.income - 1], incomeColors[country.income - 1][0], incomeColors[country.income - 1][1]);
   }
 
   glyphHover();
@@ -506,6 +501,7 @@ function drawLegend() {
       entry.shapePoints,
       entry.gradientPoints,
       entry.grainDots,
+      entry.stroke,
       entry.color[0],
       entry.color[1],
       entry.outline
@@ -521,20 +517,21 @@ function drawLegend() {
       entry.shapePoints,
       entry.gradientPoints,
       entry.grainDots,
+      noDataColor[2], // stroke 
       noDataColor[0],
       noDataColor[1],
       entry.outline
     );
   }
   push()
-  // Scritta conteggio paesi cimitero
 
+  // scritta conteggio paesi cimitero
   let nineOutOf10Row = map(9, 0, 10, y0, yAxes);
   fill(baseColor);
   textAlign(LEFT, BASELINE);
   textSize(txtSize);
   noStroke();
-  text("No data for " + cemeteryShapes.length + " countries in " + year, legendX, nineOutOf10Row);
+  text("No Data for " + cemeteryShapes.length + " countries in " + year, legendX, nineOutOf10Row);
   pop()
 }
 function drawAxes() {
@@ -542,47 +539,49 @@ function drawAxes() {
   strokeWeight(0.5);
   line(x0, y0, xAxes, y0);
 
-  //punta freccia x
+  // punta freccia x
   line(xAxes, y0, xAxes - 5, y0 - 5);
   line(xAxes, y0, xAxes - 5, y0 + 5);
 
-  //punta freccia y
+  // punta freccia y
   line(x0, yAxes, x0 - 5, yAxes - 5);
   line(x0, yAxes, x0 + 5, yAxes - 5);
 
+  let axesLabelOffset = 0.008*width;
   line(x0, y0, x0, yAxes);
   push();
   noStroke();
   fill(baseColor);
-  textFont("Georgia");
-  textSize(0.0 * width);
-  text("0 USD", x0, y0 - 15)
-  textAlign(RIGHT);
-  text("7 USD", xAxes, y0 - 15)
-  textAlign(CENTER);
-  text("COST (USD)", (x0 + xAxes) / 2, y0 - 15);
+  textFont(font);
+  textSize(txtSize);
+  textAlign(LEFT, BASELINE);
+  text("0 USD", x0, y0 - axesLabelOffset)
+  textAlign(RIGHT, BASELINE);
+  text("7 USD", xAxes, y0 - axesLabelOffset)
+  textAlign(CENTER, BASELINE);
+  text("COST (USD)", (x0 + xAxes) / 2, y0 - axesLabelOffset);
   textAlign(RIGHT, TOP);
-  text("0%", x0 - 15, y0);
-  textAlign(RIGHT, BOTTOM);
-  text("100%", x0 - 15, yAxes);
+  text("0 %", x0 - axesLabelOffset, y0);
+  textAlign(RIGHT, BASELINE);
+  text("100 %", x0 - axesLabelOffset, yAxes);
   push();
-  textAlign(CENTER);
-  translate(x0 - 15, (y0 + yAxes) / 2);
+  textAlign(CENTER, BASELINE);
+  translate(x0 - axesLabelOffset, (y0 + yAxes) / 2);
   rotate(PI * 3 / 2);
   text("UNAFFORDABILITY (%)", 0, 0);
   pop();
 }
 
-function drawGlyph(x, y, d, shapePoints, gradientPoints, grainDots, startColor, endColor, outline) {
+function drawGlyph(x, y, d, shapePoints, gradientPoints, grainDots, strokeColor, startColor, endColor, outline) {
   // riempimento dipende dall'income:
-
   noStroke();
   fill(1);
-
   push();
-
   strokeWeight(0.5);
-  stroke(startColor);
+  if (!strokeColor) {
+    strokeColor = '#000000';
+  }
+  stroke(strokeColor);
 
   if (!outline) {
     // gradiente
@@ -591,7 +590,7 @@ function drawGlyph(x, y, d, shapePoints, gradientPoints, grainDots, startColor, 
       // le coordinate di default sono il centro della figura
       fillGradient('radial', {
         // from/to: [x, y, raggio]
-        from: [x + point.x, y + point.y, d / 15], 
+        from: [x + point.x, y + point.y, d / 15],
         to: [x + point.x, y + point.y, d / 1],
         steps: [
           startColor,
@@ -633,8 +632,9 @@ function glyphHover() {
     if (isMouseInsideCountry(country)) {
       hoveringCountry = country;
       push();
-      // https://gist.github.com/lopspower/03fb1cc0ac9f32ef38f4 
-      fill("#FFF2E4D9");
+      // tabella valori alpha: https://gist.github.com/lopspower/03fb1cc0ac9f32ef38f4 
+      //  hex alpha: 90% --> E6
+      fill("#FFF2E4E6");
       rect(0, 0, width, height)
       pop();
       fill(152, 78, 78, 170)
@@ -647,15 +647,19 @@ function glyphHover() {
       push();
       noStroke();
       fill(baseColor);
-      textSize(35);
-      let interlinea = 20;
-      let textX = country.x + 80;
+      textSize(0.027 * width);
+      let interlinea = 0.013 * width;
+      // x:20 = 53:80
+      let hoverDxDistance = 0.053 * width;
+      let textX = country.x + hoverDxDistance;
       if (country.x > windowWidth * 0.5) {
-        textX = country.x - 160; // posiziona il testo a sinistra del glifo
+        // HP: larghezza finestra 1512 --> x:100 = 250:1512
+        let hoverSxDistance = 0.140 * width;
+        textX = country.x - hoverSxDistance; // posiziona il testo a sinistra del glifo
       }
       // nome paese hover
-      text(country.name, textX, country.y - interlinea);
-      textSize(15);
+      text(country.name, textX, country.y - interlinea * 1.5);
+      textSize(0.010 * width);
       // info paese hover
       let incomes = ["Low income", "Lower middle income", "Upper middle income", "High income"];
 
@@ -721,6 +725,7 @@ function drawFocus() {
     focusShapePoints,
     focusGradientPoints,
     focusGrainDots,
+    "bgColor", // no stroke
     incomeColors[selectedCountry.income - 1][0] + "50",
     incomeColors[selectedCountry.income - 1][1] + "50"
   );
@@ -731,7 +736,6 @@ function drawFocus() {
   //titolo paese del focus
   textSize(0.025 * width);
   noStroke();
-  textFont("Georgia");
   fill(baseColor);
   textAlign(CENTER, BASELINE);
   let countryBaseline = (10.5 * height) / 100;
@@ -800,24 +804,24 @@ function drawPeople(total, colored, x, y, size) {
   stroke(baseColor);
   strokeWeight(0.8);
   fill(bgColor);
+  // omini disegnati come unione di varie forme
   for (let i = 0; i < total; i++) {
     if (i < colored) {
+      // omini pieni
       fill(baseColor);
-
-      // omino == 2 cerchi + 1 quadrato
       circle(x + size / 2, y + size, size);
       circle(x + size / 2, y + size * 2.2, size);
       square(x, y + size * 2.2, size);
     } else {
+      // omini vuoti
       fill(bgColor);
-      // l'omino (due cerchi e un quadrato)
       circle(x + size / 2, y + size, size);
       arc(x + size / 2, y + size * 2.2, size, size, PI, PI * 2);
       line(x, y + size * 2.2, x, y + size * 2.2 + size);
       line(x, y + size * 2.2 + size, x + size, y + size * 2.2 + size);
       line(x + size, y + size * 2.2, x + size, y + size * 2.2 + size);
     }
-    x += size * 1.5;
+    x += size * 1.77;
   }
 }
 
@@ -827,13 +831,15 @@ function drawThreshold(total, colored, x0, y, size, label) {
   stroke(baseColor);
   strokeWeight(0.8);
   line(x0, y, xAxes, y);
+  // y: altezza dei vari elementi
   y += size;
 
   // omini
-  let figureWidth = size * 1.5; // larghezza di un singolo omino incluso spazio
+  size = size / 1000 * width;
+  let figureWidth = size * 1.7; // larghezza di un singolo omino incluso spazio
   let totalWidth = figureWidth * total; // larghezza totale di tutti gli omini
 
-  // poaizionw degli omini in modo che l'ultimo sia allineato con xAxes
+  // posizione degli omini in modo che l'ultimo sia allineato con xAxes
   let startX = xAxes - totalWidth;
 
   drawPeople(total, colored, startX, y, size);
@@ -842,7 +848,7 @@ function drawThreshold(total, colored, x0, y, size, label) {
   // testo
   noStroke();
   fill(baseColor);
-  textSize(size + 2);
+  textSize(txtSize * 0.66);
   text(label, startX, y);
 }
 
