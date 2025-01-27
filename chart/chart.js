@@ -296,7 +296,7 @@ function manageLegend() {
   ]
   legendX = windowWidth * (p1 - spacing) - btnWidth / 2;
   legendSize = width * 0.015;
-  let legendHeightOffset = 45;
+  let legendHeightOffset = 0.045*height;
   let x = legendX + legendSize / 2;
   let y = y0 + legendSize / 2;
   legendShapes = [];
