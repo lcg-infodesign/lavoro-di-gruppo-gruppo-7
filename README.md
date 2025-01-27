@@ -49,7 +49,6 @@ Ogni riga del relativo file csv rappresenta un paese, un determinato anno e i re
 ### Organizzazione del lavoro
 
 Per agevolare la realizzazione del progetto, il team si è così suddiviso i seguenti compiti:  
-Per agevolare la realizzazione del progetto, il team si è così suddiviso i seguenti compiti:  
 - Camilla Costato: brainstorming su Figma (visualizzazione) / sviluppo del concept / rielaborazione del dataset originale / codice (Show Chart, visualizzazione hover paesi, visualizzazione focus paesi)  
 - Christian Battista Giannarelli: brainstorming su Figma (visualizzazione) / codice (pagina Introduction, visualizzazione focus paesi)  
 - Emma Troni: brainstorming su Figma (visualizzazione) / sviluppo del concept / rielaborazione del dataset originale / codice (Show Chart, visualizzazione hover paesi, visualizzazione focus paesi, realizzazione glifo)  
